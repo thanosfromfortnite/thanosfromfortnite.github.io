@@ -1,0 +1,197 @@
+<!DOCTYPE HTML>
+
+<html>
+<!-- Jesse Han -->
+	<head>
+		<title>"Twenty One"</title>
+		<script src = "utilities.js"></script> <script src = "cards.js"></script>
+		<script>
+			function initialize() {
+				usedCards = [];
+				playerHand = document.getElementById("plrhand");
+				cpuHand = document.getElementById("cpuhand");
+				playerValue = document.getElementById("plrvalue");
+				cpuValue = document.getElementById("cpuvalue");
+				playerCardValue = 0;
+				playerAces = 0;
+				cpuCardValue = 0;
+				cpuAces = 0;
+				PLAYER = 0; CPU = 1;
+			}
+			
+			function addCardToHand(target) {
+				var cardAdded = getRandomCard();
+				
+				var targetHand; var targetValue;
+				if (target == PLAYER) {
+					targetHand = playerHand;
+					playerCardValue += blackjackRuleValue(cardAdded);
+					if (blackjackRuleValue(cardAdded) == 11) {
+						playerAces ++;
+					}
+				}
+				else {
+					targetHand = cpuHand;
+					cpuCardValue += blackjackRuleValue(cardAdded);
+					if (blackjackRuleValue(cardAdded) == 11) {
+						cpuAces ++;
+					}
+				}
+				
+				cardAddImg = document.createElement("img");
+				cardAddImg.setAttribute("src", card.img[cardAdded]);
+				targetHand.appendChild(cardAddImg);
+				displayValue();
+				checkForBust();
+			}
+			
+			function stand() {
+				while (cpuCardValue < 17) {
+					addCardToHand(CPU);
+					var i = 0;
+					while (i == 0) {
+						if (cpuCardValue > 21) {
+							if (cpuAces > 0) {
+								cpuCardValue -= 10;
+								cpuAces --;
+								displayValue();
+							}
+							else {
+								bust(CPU);
+								i ++;
+							}
+						}
+						else {
+							checkForWinner();
+							i ++;
+						}
+					}
+				}
+			}
+			
+			function checkForWinner() {
+				if (cpuCardValue == playerCardValue) {
+					cardPush();
+				}
+				if (cpuCardValue > playerCardValue) {
+					win(CPU);
+				}
+				if (playerCardValue > cpuCardValue) {
+					win(PLAYER);
+				}
+			}
+			
+			function win(winner) {
+				if (winner == CPU) {
+					cpuValue.innerHTML = "WINNER - " + cpuCardValue;
+					playerValue.innerHTML = "LOSER - " + playerCardValue;
+				}
+				if (winner == PLAYER) {
+					playerValue.innerHTML = "WINNER - " + playerCardValue;
+					cpuValue.innerHTML = "LOSER - " + cpuCardValue;
+				}
+				endGame();
+			}
+			
+			function checkForBust() {
+				var i = 0;
+				while (i == 0) {
+					if (playerCardValue > 21) {
+						if (playerAces > 0) {
+							playerCardValue -= 10;
+							playerAces --;
+							displayValue();
+						}
+						else {
+							bust(PLAYER);
+							i ++;
+						}
+					}
+					else {
+						i ++;
+					}
+				}
+			}
+			
+			function bust(who) {
+				if (who == PLAYER) {
+					playerValue.innerHTML = ("BUST... " + playerCardValue + " exceeds 21.");
+					cpuValue.innerHTML = ("WINNER");
+				}
+				else {
+					cpuValue.innerHTML = ("BUST... " + cpuCardValue + " exceeds 21.");
+					playerValue.innerHTML = ("WINNER");
+				}
+				endGame();
+			}
+			
+			function getRandomCard() {
+				var theCard = generateRandomInteger(0,51);
+				var i = 0;
+				while (i == 0) {
+					if (usedCards.includes(theCard)) {
+						var theCard = generateRandomInteger(0,51);
+						if (usedCards.length == 52) {
+							i ++;
+							return null;
+						}
+					}
+					else {
+						usedCards.push(theCard);
+						return(theCard);
+						i ++;
+					}
+				}
+			}
+			
+			function blackjackRuleValue(value) {
+				if (card.rank[value] > 10) {
+					return 10;
+				}
+				else if (card.rank[value] == 1) {
+					return 11;
+					
+				}
+				else {
+					return card.rank[value];
+				}
+			}
+			
+			function endGame() {
+				document.getElementById("hitbutton").disabled = true;
+				document.getElementById("standbutton").disabled = true;
+			}
+			
+			function displayValue() {
+				playerValue.innerHTML = playerCardValue;
+				cpuValue.innerHTML = cpuCardValue;
+			}
+		</script>
+		<style>
+			.strikethrough {
+				text-decoration: line-through;
+			}
+		</style>
+	</head>
+	
+	<body onload = "initialize();">
+	<div>
+		<button onclick = "addCardToHand(PLAYER);" id = "hitbutton">Test</button>
+		<button onclick = "stand();" id = "standbutton">Stand</button>
+	</div>
+	<div id = "plrhand">
+	
+	</div>
+	
+	<div id = "plrvalue"></div>
+	
+	<div id = "cpuhand">
+	
+	</div>
+	
+	<div id = "cpuvalue"></div>
+	
+	<hr />
+	<a href = "index.html"><button>All About Cards</button></a> <a href = "game.html"><button>Play <span class = "strikethrough">Blackjack</span> Twenty One</button></a>
+	</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+
+<html>
+<!-- Jesse Han -->
+	<head>
+		<title>Title</title>
+		<script src = "cards.js"></script>
+		<script src = "utilities.js"></script>
+		<script>
+			function initialize() {
+				cardSpace = document.getElementById("card_space");
+			}
+			
+			function takeCardOut() {
+			if (card.img[0] != null) {
+					var cardIQ = card.img.shift();
+					var cardAdded = document.createElement("img");
+					cardAdded.setAttribute("src", cardIQ);
+					cardAdded.setAttribute("onclick","card.img.push(this.src);var cardIQ = this;cardSpace.removeChild(cardIQ);");
+					cardSpace.appendChild(cardAdded);
+				}
+			}
+		</script>
+		<style>
+
+		</style>
+	</head>
+	
+	<body onload = "initialize();">
+		<img src = "cardimages/back-blue-75-1.png" onclick = "takeCardOut();" />
+		<div id = "card_space">
+		</div>
+		
+	</body>
+</html>
