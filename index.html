@@ -1,29 +1,219 @@
 <!DOCTYPE HTML>
 
 <html>
-<!-- Jesse Han -->
+<!-- Jesse H., a.k.a. Dirt -->
 	<head>
-		<title>All About Cards</title>
-		<script src = "utilities.js"></script>
+		<title>Gamepull Odds Calc-er</title>
 		<script>
-			function initialize() {
-				
+			const COMMON = 0;
+			const UNCOMMON = 1;
+			const RARE = 2;
+			const EPIC = 3;
+			const LEGENDARY = 4;
+			const MYTHICAL = 5;
+			const VARIANTCARD = 11;
+			const ALLSTAR = 6;
+			const MATERIAL = 7;
+			const MEMORY = 8;
+			const BLUEPRINT = 9;
+			const CORE = 10;
+			
+			currentPack = "BASE";
+			
+			const displayPulls = ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythical", "All-Star", "Material", "Memory", "Blueprint", "Core", "Variant"];
+			const odds = [];
+				odds["BASE"] = [66.088, 20.0, 8.0, 4.5, 0.8, 0.3, 0.2, 0.05, 0.04, 0.02, 0.002, 5.0];
+				odds["UNCOMMON"] = [0.0, 69.666, 17.0, 10.1, 2.0, 0.61, 0.4, 0.1, 0.08, 0.04, 0.004, 6.0];
+				odds["RARE"] = [0.0, 0.0, 62.84, 27.6, 6.0, 2.0, 1.0, 0.25, 0.2, 0.1, 0.01, 7.0];
+				odds["EPIC"] = [0.0, 0.0, 0.0, 74.88, 18.0, 4.0, 2.0, 0.5, 0.4, 0.2, 0.02, 8.5];
+				odds["LEGENDARY"] = [0.0, 0.0, 0.0, 0.0, 85.32, 10.0, 3.0, 0.75, 0.6, 0.3, 0.03, 10.0];
+				odds["VARIANTPACK"] = [0.0, 0.0, 0.0, 0.0, 44.72, 45.92, 6.0, 1.5, 1.2, 0.6, 0.06, 100.0];
+			
+			// updates the display of odds to the current pack
+			function oddsUpdater(pack) {
+				currentPack = pack;
+				document.getElementById("packIndicator").textContent = currentPack;
+				document.getElementById("odds").textContent = displayOdds(currentPack);
 			}
+			
+			// constructs a list of odds
+			function displayOdds(pack) {
+				out = "";
+				for (var i = 0; i < odds[pack].length; i ++) {
+					out += odds[pack][i] + "%\n";
+				}
+				return out;
+			}
+			
+			// the whole pickle
+			function simulateOpenings() {
+				simulations = parseInt(document.getElementById("packQuantity").value);
+				console.log(simulations);
+				nonvariants = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+				variants = [0, 0, 0, 0, 0, 0];
+				if (simulations < 1 || isNaN(simulations)) {
+					document.getElementById("angryMessage").hidden = false;
+				}
+				else {
+					document.getElementById("angryMessage").hidden = true;
+					
+					// setting up thresholds for a 0-100 range
+					// base common rate
+					const thresholds = [odds[currentPack][0]]
+					for (var i = 1; i < odds[currentPack].length - 1; i ++) {
+						thresholds[i] = thresholds[i-1] + odds[currentPack][i];
+					}
+					
+					// ok actual rng time
+					for (var i = 0; i < simulations; i ++) {
+						const roll = Math.random() * 100.0;
+						highest = 0;
+						for (var j = thresholds.length - 1; j >= 0; j --) {
+							if (roll < thresholds[j]) {
+								highest = j;
+							}
+						}
+						if (Math.random() * 100.0 < odds[currentPack][VARIANTCARD] && highest <= 5) {
+							variants[highest] ++;
+						}
+						else {
+							nonvariants[highest] ++;
+						}
+					}
+					document.getElementById("simQuantity").textContent = simulations;
+					out = `${nonvariants[COMMON]+variants[COMMON]} pulled (${variants[COMMON]} variants)\n`; // Commons
+					out += `${nonvariants[UNCOMMON]+variants[UNCOMMON]} pulled (${variants[UNCOMMON]} variants)\n`;
+					out += `${nonvariants[RARE]+variants[RARE]} pulled (${variants[RARE]} variants)\n`;
+					out += `${nonvariants[EPIC]+variants[EPIC]} pulled (${variants[EPIC]} of them are variants)\n`;
+					out += `${nonvariants[LEGENDARY]+variants[LEGENDARY]} pulled (${variants[LEGENDARY]} variants)\n`;
+					out += `${nonvariants[MYTHICAL]+variants[MYTHICAL]} pulled (${variants[MYTHICAL]} variants)\n`;
+					out += `${nonvariants[ALLSTAR]} pulled\n`;
+					out += `${nonvariants[MATERIAL]} pulled\n`;
+					out += `${nonvariants[MEMORY]} pulled\n`;
+					out += `${nonvariants[BLUEPRINT]} pulled\n`;
+					out += `${nonvariants[CORE]} pulled`;
+					document.getElementById("results").textContent = out;
+					
+					outPercentage = `${(nonvariants[COMMON] + variants[COMMON]) * 100.0 / simulations}%\n`;
+					outPercentage += `${(nonvariants[UNCOMMON] + variants[UNCOMMON]) * 100.0 / simulations}%\n`;
+					outPercentage += `${(nonvariants[RARE] + variants[RARE]) * 100.0 / simulations}%\n`;
+					outPercentage += `${(nonvariants[EPIC] + variants[EPIC]) * 100.0 / simulations}%\n`;
+					outPercentage += `${(nonvariants[LEGENDARY] + variants[LEGENDARY]) * 100.0 / simulations}%\n`;
+					outPercentage += `${(nonvariants[MYTHICAL] + variants[MYTHICAL]) * 100.0 / simulations}%\n`;
+					outPercentage += `${nonvariants[ALLSTAR] * 100.0 / simulations}%\n`;
+					outPercentage += `${nonvariants[MATERIAL] * 100.0 / simulations}%\n`;
+					outPercentage += `${nonvariants[MEMORY] * 100.0 / simulations}%\n`;
+					outPercentage += `${nonvariants[BLUEPRINT] * 100.0 / simulations}%\n`;
+					outPercentage += `${nonvariants[CORE] * 100.0 / simulations}%`;
+					
+					
+					document.getElementById("resultsPercentage").textContent = outPercentage;
+					
+				}
+			}
+			
 		</script>
 		<style>
-			.strikethrough {
-				text-decoration: line-through;
+			.odds {
+				border-style: dashed;
+				border-color: gray;
+				width: fit-content;
+				text-align: left;
+			}
+			.row:after {
+			  content: "";
+			  display: table;
+			  clear: both;
+			}
+			.column {
+				width: 100px;
+				float: left;
 			}
 		</style>
 	</head>
 	
-	<body onload = "initialize();">
-		<h1>All About Cards</h1>
+	<body onload="">
+		<h1>Gamepull Card Odds</h1>
+		<h3>By Dirt. Not vibecoded. I'm just dumb as shit. Thanks W3schools.</h3>
 		
+		<div class="odds">
+			<div>
+				<select id="packs" name="packs" onchange="oddsUpdater(this.value);">
+					<option value="BASE" selected>Base Pack</option>
+					<option value="UNCOMMON">Uncommon Pack</option>
+					<option value="RARE">Rare Pack</option>
+					<option value="EPIC">Epic Pack</option>
+					<option value="LEGENDARY">Legendary Pack</option>
+					<option value="VARIANTPACK">Variant Pack</option>
+				</select>
+			</div>
+			<div class="row">
+				<div class="column">
+					<div style="background-color: gray; color: white">Common:</div>
+					<div style="background-color: green; color: white">Uncommon:</div>
+					<div style="background-color: blue; color: white">Rare:</div>
+					<div style="background-color: purple; color: white">Epic:</div>
+					<div style="background-color: orange">Legendary:</div>
+					<div style="background-color: red; color: white">Mythical:</div>
+					<div style="background-color: yellow">All-Star:</div>
+					<div>Material:</div>
+					<div>Memory:</div>
+					<div>Blueprint:</div>
+					<div>Core:</div>
+					<div>Variant:</div>
+				</div>
+				<div id="odds" class="column" style="white-space: pre-line">66.088%
+					20%
+					8%
+					4.5%
+					0.8%
+					0.3%
+					0.2%
+					0.05%
+					0.04%
+					0.02%
+					0.002%
+					5%
+				</div>
+			</div>
+		</div>
 		
-		
-		
+		<div>
+			<label for="packQuantity">Simulate opening </label>
+			<input type="number" id="packQuantity" min="1">
+			<span id="packIndicator">BASE</span>
+			<span> packs</span>
+			<br />
+			<button onclick="simulateOpenings();">aight</button>
+			<div>*variants increase a card's score which raises its classified rarity. an epic card with a variant may mean it could be legendary or mythical in the real game</div>
+		</div>
 		<hr />
-		<a href = "index.html"><button>All About Cards</button></a> <a href = "game.html"><button>Play <span class = "strikethrough">Blackjack</span> Twenty One</button></a>
+		<div style="color: red" id="angryMessage" hidden>I can't believe you did that.</div>
+		<div>
+			Of the <span id="simQuantity">X</span> packs opened,
+		</div>
+		<div>
+			<div class="row">
+				<div class="column">
+					<div style="background-color: gray; color: white">Common:</div>
+					<div style="background-color: green; color: white">Uncommon:</div>
+					<div style="background-color: blue; color: white">Rare:</div>
+					<div style="background-color: purple; color: white">Epic:</div>
+					<div style="background-color: orange">Legendary:</div>
+					<div style="background-color: red; color: white">Mythical:</div>
+					<div style="background-color: yellow">All-Star:</div>
+					<div>Material:</div>
+					<div>Memory:</div>
+					<div>Blueprint:</div>
+					<div>Core:</div>
+				</div>
+				<div id="results" class="column" style="width: fit-content; white-space: pre-line" >
+				
+				</div>
+				<div id="resultsPercentage" class="column" style="width: fit-content; white-space: pre-line; padding-left: 5px;" >
+				
+				</div>
+			</div>
+		</div>
 	</body>
 </html>
