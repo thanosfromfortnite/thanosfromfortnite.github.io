@@ -81,12 +81,12 @@
 						}
 					}
 					document.getElementById("simQuantity").textContent = simulations;
-					out = `${nonvariants[COMMON]+variants[COMMON]} pulled (${variants[COMMON]} variants)\n`; // Commons
-					out += `${nonvariants[UNCOMMON]+variants[UNCOMMON]} pulled (${variants[UNCOMMON]} variants)\n`;
-					out += `${nonvariants[RARE]+variants[RARE]} pulled (${variants[RARE]} variants)\n`;
-					out += `${nonvariants[EPIC]+variants[EPIC]} pulled (${variants[EPIC]} of them are variants)\n`;
-					out += `${nonvariants[LEGENDARY]+variants[LEGENDARY]} pulled (${variants[LEGENDARY]} variants)\n`;
-					out += `${nonvariants[MYTHICAL]+variants[MYTHICAL]} pulled (${variants[MYTHICAL]} variants)\n`;
+					out = `${nonvariants[COMMON]+variants[COMMON]} pulled (${variants[COMMON]} variants*)\n`; // Commons
+					out += `${nonvariants[UNCOMMON]+variants[UNCOMMON]} pulled (${variants[UNCOMMON]} variants*)\n`;
+					out += `${nonvariants[RARE]+variants[RARE]} pulled (${variants[RARE]} variants*)\n`;
+					out += `${nonvariants[EPIC]+variants[EPIC]} pulled (${variants[EPIC]} of them are variants*)\n`;
+					out += `${nonvariants[LEGENDARY]+variants[LEGENDARY]} pulled (${variants[LEGENDARY]} variants*)\n`;
+					out += `${nonvariants[MYTHICAL]+variants[MYTHICAL]} pulled (${variants[MYTHICAL]} variants*)\n`;
 					out += `${nonvariants[ALLSTAR]} pulled\n`;
 					out += `${nonvariants[MATERIAL]} pulled\n`;
 					out += `${nonvariants[MEMORY]} pulled\n`;
@@ -180,7 +180,7 @@
 		
 		<div class="odds">
 			<div>
-				<select id="packs" name="packs" onchange="oddsUpdater(this.value);">
+				<select id="packs" name="packs" onload="oddsUpdater(this.value);" onchange="oddsUpdater(this.value);">
 					<option value="BASE" selected>Base Pack</option>
 					<option value="UNCOMMON">Uncommon Pack</option>
 					<option value="RARE">Rare Pack</option>
@@ -227,7 +227,6 @@
 			<span> packs</span>
 			<br />
 			<button onclick="simulateOpenings();">aight</button>
-			<div>*variants increase a card's score which raises its classified rarity. an epic card with a variant may mean it could be legendary or mythical in the real game</div>
 		</div>
 		<hr />
 		<div style="color: red" id="angryMessage" hidden>I can't believe you did that.</div>
@@ -256,6 +255,7 @@
 				
 				</div>
 			</div>
+			<div>*variants increase a card's score which raises its classified rarity. an epic card with a variant may mean it could be legendary or mythical in the real game</div>
 		</div>
 	</body>
 </html>
