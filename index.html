@@ -19,9 +19,13 @@
 			const CORE = 10;
 			
 			currentPack = "BASE";
+			currentOpenType = "PACKS";
 			
 			const displayPulls = ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythical", "All-Star", "Material", "Memory", "Blueprint", "Core", "Variant"];
-			const odds = [];
+			const openTypeMultipliers = {};
+			openTypeMultipliers["PACKS"] = 5;
+			openTypeMultipliers["CARDS"] = 1;
+			const odds = {};
 				odds["BASE"] = [66.088, 20.0, 8.0, 4.5, 0.8, 0.3, 0.2, 0.05, 0.04, 0.02, 0.002, 5.0];
 				odds["UNCOMMON"] = [0.0, 69.666, 17.0, 10.1, 2.0, 0.61, 0.4, 0.1, 0.08, 0.04, 0.004, 6.0];
 				odds["RARE"] = [0.0, 0.0, 62.84, 27.6, 6.0, 2.0, 1.0, 0.25, 0.2, 0.1, 0.01, 7.0];
@@ -30,7 +34,8 @@
 				odds["VARIANTPACK"] = [0.0, 0.0, 0.0, 0.0, 44.72, 45.92, 6.0, 1.5, 1.2, 0.6, 0.06, 100.0];
 			const packCosts = [100, 200, 500, 1000, 1500, 3000];
 			const packValues = [1, 0, 0, 0, 0, 0];
-			const cardValues = [1, 2, 0, 0, 0, 0];
+			const cardValues = [1, 2, 5, 6, 11, 0, 0, 0, 1, 0, 0];
+			// Inspired packs +1?
 			
 			// updates the display of odds to the current pack
 			function oddsUpdater(pack) {
@@ -48,10 +53,14 @@
 				return out;
 			}
 			
+			function updateOpenType(type) {
+				currentOpenType = type;
+			}
+			
 			// the whole pickle
 			function simulateOpenings() {
-				simulations = parseInt(document.getElementById("packQuantity").value);
-				console.log(simulations);
+				quantityToSim = parseInt(document.getElementById("packQuantity").value);
+				simulations = quantityToSim * openTypeMultipliers[currentOpenType];
 				nonvariants = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 				variants = [0, 0, 0, 0, 0, 0];
 				if (simulations < 1 || isNaN(simulations)) {
@@ -87,7 +96,7 @@
 					out = `${nonvariants[COMMON]+variants[COMMON]} pulled (${variants[COMMON]} variants*)\n`; // Commons
 					out += `${nonvariants[UNCOMMON]+variants[UNCOMMON]} pulled (${variants[UNCOMMON]} variants*)\n`;
 					out += `${nonvariants[RARE]+variants[RARE]} pulled (${variants[RARE]} variants*)\n`;
-					out += `${nonvariants[EPIC]+variants[EPIC]} pulled (${variants[EPIC]} of them are variants*)\n`;
+					out += `${nonvariants[EPIC]+variants[EPIC]} pulled (${variants[EPIC]} variants*)\n`;
 					out += `${nonvariants[LEGENDARY]+variants[LEGENDARY]} pulled (${variants[LEGENDARY]} variants*)\n`;
 					out += `${nonvariants[MYTHICAL]+variants[MYTHICAL]} pulled (${variants[MYTHICAL]} variants*)\n`;
 					out += `${nonvariants[ALLSTAR]} pulled\n`;
@@ -227,14 +236,17 @@
 			<label for="packQuantity">Simulate opening </label>
 			<input type="number" id="packQuantity" min="1">
 			<span id="packIndicator">BASE</span>
-			<span> packs</span>
+			<select id="openType" name="openType" onchange="updateOpenType(this.value);">
+				<option value="PACKS" selected>packs</option>
+				<option value="CARDS">cards</option>
+			</select>
 			<br />
 			<button onclick="simulateOpenings();">aight</button>
 		</div>
 		<hr />
 		<div style="color: red" id="angryMessage" hidden>I can't believe you did that.</div>
 		<div>
-			Of the <span id="simQuantity">X</span> packs opened,
+			Of the <span id="simQuantity">X</span> cards simulated,
 		</div>
 		<div>
 			<div class="row">
